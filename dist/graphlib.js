@@ -998,9 +998,9 @@ Graph.prototype.setEdge = function() {
   this.setNode(v);
   this.setNode(w);
 
-  this._edgeLabels[e] = valueSpecified ? value : this._defaultEdgeLabelFn(v, w, name);
+  this._edgeLabels[e] = valueSpecified ? value : this._defaultEdgeLabelFn(v, w, name) || {};
 
-  var edgeObj = edgeArgsToObj(this._isDirected, v, w, name);
+  var edgeObj = edgeArgsToObj(this._isDirected, v, w, name, this._edgeLabels[e]);
   // Ensure we add undirected edges in a consistent way.
   v = edgeObj.v;
   w = edgeObj.w;
@@ -1101,15 +1101,20 @@ function edgeArgsToId(isDirected, v_, w_, name) {
              (_.isUndefined(name) ? DEFAULT_EDGE_NAME : name);
 }
 
-function edgeArgsToObj(isDirected, v_, w_, name) {
+function edgeArgsToObj(isDirected, v_, w_, name, value) {
   var v = "" + v_;
   var w = "" + w_;
+  var vport = "" + value.vport;
+  var wport = "" + value.wport;
   if (!isDirected && v > w) {
     var tmp = v;
     v = w;
     w = tmp;
+    tmp = vport;
+    vport = wport;
+    wport = tmp;
   }
-  var edgeObj =  { v: v, w: w };
+  var edgeObj =  { v: v, w: w, vport: vport, wport: wport };
   if (name) {
     edgeObj.name = name;
   }
